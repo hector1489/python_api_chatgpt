@@ -1,6 +1,9 @@
 import streamlit as st
+import openai
 
-st.title("Asistente IA")
+openai.api_key = "tu_clave_de_api"
+
+st.title("Assistant IA")
 
 if "messages" not in st.session_state:
     st.session_state.messages = []
@@ -16,7 +19,19 @@ if prompt := st.chat_input("como puedo ayudarte?"):
         st.markdown(prompt)
     st.session_state.messages.append({"role": "user", "content": prompt})
 
-    with st.chat_message("assistant"):
-        st.markdown("Hola, como puedo ayudarte?")
+    response = openai.Completion.create(
+        engine="text-davinci-003",
+        prompt=prompt,
+        max_tokens=150,
+        temperature=0.9,
+        top_p=1,
+        frequency_penalty=0,
+        presence_penalty=0
+    )
 
-    st.session_state.messages.append({"role": "assistant", "content": "Hola, como puedo ayudarte?"})
+    assistant_response = response.choices[0].text.strip()
+
+    with st.chat_message("assistant"):
+        st.markdown(assistant_response)
+
+    st.session_state.messages.append({"role": "assistant", "content": assistant_response})
